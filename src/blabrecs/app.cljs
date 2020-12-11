@@ -50,6 +50,22 @@
     (set! (.-innerText status-line) (:msg result))
     (set! (.-disabled submit-button) (not (= (:status result) :ok)))))
 
+(defn try-submit-word! []
+  (let [word-tester (js/document.getElementById "wordtester")
+        lexicon-table (js/document.getElementById "lexicon")
+        word (str/trim (str/lower-case (.-value word-tester)))
+        result (test-word word)]
+    (when (= (:status result) :ok)
+      (set! (.-className lexicon-table) "") ; remove disabled state
+      (let [row (.insertRow lexicon-table 1)
+            word-cell (.insertCell row 0)
+            def-cell (.insertCell row 1)
+            textarea (js/document.createElement "textarea")]
+        (set! (.-innerText word-cell) word)
+        (.appendChild def-cell textarea))
+      (set! (.-value word-tester) "")
+      (test-word!))))
+
 ;;; init
 
 (js/console.log "hello from JS!")
@@ -69,5 +85,10 @@
     (test-word!)))
 
 (.addEventListener (js/document.getElementById "wordtester") "input" test-word!)
+
+(.addEventListener (js/document.getElementById "wordtester") "keypress"
+  #(when (= (.-key %) "Enter") (try-submit-word!)))
+
+(.addEventListener (js/document.getElementById "playit") "click" try-submit-word!)
 
 (test-word!)
