@@ -70,7 +70,7 @@
 
 (js/console.log "hello from JS!")
 
-(load-file! "/model.edn"
+(load-file! "model.edn"
   (fn [res]
     (js/console.log "loaded model!")
     (let [model (edn/read-string (.-responseText res))
@@ -78,7 +78,7 @@
       (swap! app-state assoc :model model :baselines baselines)
       (test-word!))))
 
-(load-file! "/words.txt"
+(load-file! "words.txt"
   (fn [res]
     (js/console.log "loaded words!")
     (swap! app-state assoc :words (set (str/split (.-responseText res) "\n")))
