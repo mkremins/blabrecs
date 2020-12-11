@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blabrecs</title>
+  <style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    font-family: Georgia, serif;
+    font-size: 18px;
+    margin: 0 auto;
+    max-width: 80ch;
+    text-align: center;
+  }
+  header {
+    margin-bottom: 2rem;
+    margin-top: 2rem;
+  }
+  #wordtester {
+    font-family: Georgia, serif;
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+    text-align: center;
+  }
+  #wordtester:not(:placeholder-shown) {
+    text-transform: uppercase;
+  }
+  #wordinfo {
+    font-size: 16px;
+    margin-bottom: 0.5rem;
+  }
+  #wordinfo.ok {
+    color: forestgreen;
+  }
+  #wordinfo.err {
+    color:darkred;
+  }
+  .buttons {
+    margin-bottom: 2rem;
+  }
+  button {
+    background: #555;
+    border: none;
+    border-radius: 0.5rem;
+    color: white;
+    font-family: Georgia, serif;
+    font-size: 1.25rem;
+    padding: 0.25rem 0.5rem;
+  }
+  #playit:not(:enabled) {
+    cursor: not-allowed;
+    opacity: 50%;
+  }
+  #playit:enabled {
+    background: forestgreen;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  th {
+    background: #555;
+    color: white;
+  }
+  tr:nth-child(odd) {
+    background: #eee;
+  }
+  td:first-child {
+    font-size: 1.5rem;
+    width: 25%;
+  }
+  td:last-child {
+    width: 75%;
+  }
+  textarea {
+    width: 100%;
+  }
+  .longdesc {
+    line-height: 1.4;
+    margin: 0 auto;
+    margin-top: 5rem;
+    max-width: 60ch;
+    padding: 0 2ch;
+    text-align: left;
+  }
+  .longdesc h2, .longdesc p {
+    margin-bottom: 1rem;
+  }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>BLABRECS</h1>
+    <p>it's like scrabble but worse</p>
+  </header>
+  <main>
+    <input type="text" id="wordtester" placeholder="test a word...">
+    <p id="wordinfo">can't play that, it's a real word!</p>
+    <div class="buttons">
+      <button id="playit">Play It</button>
+    </div>
+    <table>
+      <tr>
+        <th>Word</th>
+        <th>Meaning</th>
+      </tr>
+      <tr>
+        <td>TEOSS</td>
+        <td><textarea></textarea></td>
+      </tr>
+      <tr>
+        <td>BIOSM</td>
+        <td><textarea></textarea></td>
+      </tr>
+      <tr>
+        <td>OULUS</td>
+        <td><textarea></textarea></td>
+      </tr>
+    </table>
+    <div class="longdesc">
+      <h2>What's all this, then?</h2>
+      <p><strong>BLABRECS</strong> is a rules modification for the wordgame SCRABBLE that swaps out the dictionary of real-if-obscure English words for a capricious artificial intelligence. In BLABRECS, real English words aren't allowed! Instead, you have to play nonsense words that <em>sound</em> like English to the AI. These nonsense words are called – you guessed it – BLABRECS.</p>
+      <h2>How do I play?</h2>
+      <p>Get together your regular SCRABBLE supplies and pull up this page in a web browser. Then play SCRABBLE as normal, but before you play a word, use the "test a word..." box at the top of the page to check whether the AI will let you play it. Remember, you can only play words that the AI approves!</p>
+      <p>When you find a legal word to play, hit the "Play It" button to add this word to the lexicon. As you play, you can write in definitions for all the words you've invented in the "Meaning" textbox next to each word. The player who comes up with the best definition for a word can add half of that word's points to their SCRABBLE score at the end of the game.</p>
+      <h2>How does the AI work?</h2>
+      <p>Right now it uses a <a href="">Markov model</a> trained on the English dictionary that ships with Mac OS X 10.15.3 (in the <code>/usr/share/dict/words</code> text file). It looks at the statistical patterns of letter sequences in English words and uses this information to determine how likely a sequence of letters is to be a real English word. Then it rejects both real dictionary words and fake words that it deems insufficiently statistically likely.</p>
+      <p>I might update BLABRECS to provide a wider range of AI "opponents" using a variety of different technologies in the future. Stay tuned!</p>
+      <h2>Why is it called BLABRECS?</h2>
+      <p>I generated every possible permutation of the word SCRABBLE and asked the AI to sort them from least to most statistically likely. BRABLECS won out by a significant margin, beating not only the real word SCRABBLE but also my hand-designed previous title BESCRALB. Then I switched the L and the R because BLABRECS sounds better and I'm not about to let a computer tell me what to do.</p>
+      <h2>Who are you?</h2>
+      <p>I'm <a href="https://mkremins.github.io">Max Kreminski</a>, an artifical intelligence researcher and game designer. At the time of this release (December 2020), I'm working on my PhD in Computational Media at the University of California, Santa Cruz. I make a lot of weird stuff with AI; if you want to keep tabs on my work, you can <a href="https://twitter.com/maxkreminski">follow me on Twitter</a>.</p>
+    </div>
+  </main>
+</body>
+<script src="/out/main.js"></script>
+</html>
