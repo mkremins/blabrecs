@@ -35,9 +35,11 @@
       (> (count word) 15)
         {:status :err :msg "that's too long, it won't fit on the board!"}
       (contains? (:words @app-state) word)
-        {:status :err :msg  "can't play that, it's in the dictionary!"}
+        {:status :err :msg "can't play that, it's in the dictionary!"}
       (not (sufficiently-probable? word))
-        {:status :err :msg  "no way that's a word!"}
+        {:status :err :msg "no way that's a word!"}
+      (some #(str/includes? word %) (:badwords state))
+        {:status :err :msg "no way that's a word!"}
       :else
         {:status :ok :msg "looks good to me!"})))
 
@@ -83,6 +85,11 @@
     (js/console.log "loaded words!")
     (swap! app-state assoc :words (set (str/split (.-responseText res) "\n")))
     (test-word!)))
+
+(load-file! "https://raw.githubusercontent.com/dariusk/wordfilter/master/lib/badwords.json"
+  (fn [res]
+    (js/console.log "loaded badwords!")
+    (swap! app-state assoc :badwords (js->clj (js/JSON.parse (.-responseText res))))))
 
 (.addEventListener (js/document.getElementById "wordtester") "input" test-word!)
 
