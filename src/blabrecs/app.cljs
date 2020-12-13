@@ -80,10 +80,10 @@
       (swap! app-state assoc :model model :baselines baselines)
       (test-word!))))
 
-(load-file! "words.txt"
+(load-file! "enable.txt"
   (fn [res]
     (js/console.log "loaded words!")
-    (swap! app-state assoc :words (set (str/split (.-responseText res) "\n")))
+    (swap! app-state assoc :words (set (str/split-lines (.-responseText res))))
     (test-word!)))
 
 (load-file! "https://raw.githubusercontent.com/dariusk/wordfilter/master/lib/badwords.json"

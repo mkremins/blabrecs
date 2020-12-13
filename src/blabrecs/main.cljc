@@ -28,7 +28,7 @@
   [counts]
   (let [total (apply + (vals counts))]
     (reduce-kv (fn [probs char char-count]
-                 (assoc probs char (/ char-count total)))
+                 (assoc probs char (double (/ char-count total))))
                {} counts)))
 
 (defn process-word
