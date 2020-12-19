@@ -70,8 +70,15 @@
   [model word]
   (js/console.log word)
   (js/console.log (neural/vectorize-word word))
-  (let [promise (js/tf.loadLayersModel "model.json")]
-    (.then promise #(js/console.log %) #(js/console.log %)))
+  (let [vect-word (neural/vectorize-word word)
+        demo-array (apply array [2 3 4 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0])
+        demo-tensor (js/tf.tensor vect-word (apply array [1 24]))
+        model (js/tf.loadLayersModel "model.json")
+        ]
+    (js/console.log demo-tensor)
+    (.then model
+      #(js/console.log (first (. (. % (predict demo-tensor {:verbose true})) dataSync)))
+      #(js/console.log %)))
   (let [subprobs (->> (word->ngrams ngram-size word)
                       (map #(get-in model (ngram->path %))))
         prob (apply * subprobs)]
