@@ -1,5 +1,6 @@
 (ns blabrecs.main
-  (:require [clojure.string :as str]))
+  (:require [clojure.string :as str]
+            [blabrecs.neural :as neural]))
 
 ;;; common utility functions
 
@@ -67,6 +68,10 @@
   the model's total probability for this word and whose second item is
   a seq of the model's individual subprobabilities for this word."
   [model word]
+  (js/console.log word)
+  (js/console.log (neural/vectorize-word word))
+  (let [promise (js/tf.loadLayersModel "model.json")]
+    (.then promise #(js/console.log %) #(js/console.log %)))
   (let [subprobs (->> (word->ngrams ngram-size word)
                       (map #(get-in model (ngram->path %))))
         prob (apply * subprobs)]
@@ -76,4 +81,7 @@
   "Given a Markov `model` and a `word`, return the model's total probability
   for this word."
   [model word]
+
   (first (probability* model word)))
+
+(js/console.log "main loaded")
