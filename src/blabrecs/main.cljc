@@ -68,16 +68,11 @@
   the model's total probability for this word and whose second item is
   a seq of the model's individual subprobabilities for this word."
   [model word]
-  (js/console.log word)
-  (js/console.log (neural/vectorize-word word))
-  (let [vect-word (neural/vectorize-word word)
-        demo-array (apply array [2 3 4 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0])
-        demo-tensor (js/tf.tensor vect-word (apply array [1 24]))
-        model (js/tf.loadLayersModel "model.json")
-        ]
-    (js/console.log demo-tensor)
+  (let [word-tensor (js/tf.tensor (neural/vectorize-word word)
+                                  (apply array [1 24]))
+        model (js/tf.loadLayersModel "model.json")]
     (.then model
-      #(js/console.log (first (. (. % (predict demo-tensor {:verbose true})) dataSync)))
+      #(js/console.log (first (. (. % (predict word-tensor {:verbose true})) dataSync)))
       #(js/console.log %)))
   (let [subprobs (->> (word->ngrams ngram-size word)
                       (map #(get-in model (ngram->path %))))

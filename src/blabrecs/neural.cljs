@@ -1,7 +1,6 @@
 (ns blabrecs.neural
   )
 
-
 (defn vectorize-word [word]
   """Convert a string into the tokenized vector that the tensorflow
   model can understand."""
@@ -11,13 +10,7 @@
         "y" 18,"b" 19, "f" 20,"v" 21,"k" 22,"w" 23,"z" 24,"x" 25,
         "q" 26,"j" 27, "'" 28, "/" 29, "\"" 30, "1" 31,"0" 32,
         "8" 33,"5" 34,"7" 35,"6" 36,"9" 37,"2" 38,"3" 39,"4" 40}]
-        ;(js/tf.transpose
-          ;(js/tf.tensor
           (apply array
             (first
               (partition 24 24 (repeat 0) (map #(get tokenizer % 0) word))
               ))))
-
-;const model = await tf.loadLayersModel('https://isaackarth.com/files/tf_blabrecs/model.json');
-;    let predict_test = model.predict(tokenized_word);
-;    console.log(Array.from(predict_test.dataSync())[0]);
