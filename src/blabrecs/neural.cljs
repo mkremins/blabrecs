@@ -1,6 +1,8 @@
 (ns blabrecs.neural
   )
 
+(def neural-state (atom {:word-map {}}))
+
 (defn vectorize-word [word]
   "Convert a string into the tokenized vector that the tensorflow
   model can understand."
@@ -35,14 +37,23 @@
     ;     word-tensor (js/tf.tensor (clj->js word-vectors) [(count words) 24])
     ;     v3 (js/console.log word-tensor)
         word-vectors (map vectorize-word words)
-        v4 (js/console.log word-vectors)
-        v5 (js/console.log (str word-vectors))
+        ;v4 (js/console.log word-vectors)
+        ;v5 (js/console.log (str word-vectors))
         word-tensor (js/tf.tensor (clj->js word-vectors) (apply array [(count words) 24]))
 
         ]
     (.then model
-      #(js/console.log
-        (. (. % (predict word-tensor {:verbose true})) dataSync))
+      (fn [word]
+      (let [predictions
+              (. (. word (predict word-tensor {:verbose true})) dataSync)
+            word-map (into {} (map vector words predictions)) ]
+        ;(js/console.log predictions)
+        ;(js/console.log word-map)
+        ;(js/console.log (str word-map))
+        (swap! neural-state assoc :predictions predictions :words words)
+        (swap! neural-state assoc
+          :word-map (merge (:word-map @neural-state) word-map))
+        ))
       #(js/console.log %))
       1.0))
 
@@ -54,8 +65,10 @@
   "
   [model word]
   (let [the-model (or model (load-model))
-        v1 (js/console.log word)
-        v2 (js/console.log [word])
-        v3 (js/console.log the-model)
+        ;v1 (js/console.log word)
+        ;v2 (js/console.log [word])
+        ;v3 (js/console.log the-model)
         prediction (probability* the-model [word "test"])]
+        (js/console.log (str (:word-map @neural-state)))
+        (js/console.log (str (get (:word-map @neural-state) word)))
         prediction))
