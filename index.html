@@ -58,6 +58,14 @@
     font-family: Georgia, serif;
     font-size: 1.25rem;
     padding: 0.25rem 0.5rem;
+    margin-bottom: 1em;
+  }
+  button:hover {
+    background: #121312;
+  }
+  button:active {
+    background: yellow;
+    color: black;
   }
   #playit:not(:enabled) {
     cursor: not-allowed;
@@ -113,7 +121,8 @@
     <input type="text" id="wordtester" placeholder="test a word...">
     <p id="wordinfo">can't play that, it's a real word!</p>
     <div class="buttons">
-      <button id="playit">Play It</button>
+      <button id="playit">Play It</button><br>
+      <button id="modeswitch">Current Mode: Loading...</button>
     </div>
     <table id="lexicon" class="disabled">
       <tr>

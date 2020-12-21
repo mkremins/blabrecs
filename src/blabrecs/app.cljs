@@ -20,7 +20,7 @@
 (defn sufficiently-probable? [word]
   (let [{:keys [model baselines cnn mode]} @app-state]
       (cond
-        (= mode "cnn")
+        (= mode "CNN")
           (> (neural/probability cnn word) 0.82)
         :else
           (> (blabrecs/probability model word)
@@ -74,6 +74,14 @@
       (set! (.-value word-tester) "")
       (test-word!))))
 
+(defn switch-mode! []
+  (let [modes ["Markov" "CNN"]
+        {:keys [mode]} @app-state
+        next-mode (get modes (mod (+ (.indexOf modes mode) 1) (count modes)))]
+    (swap! app-state assoc :mode next-mode)
+    (aset (js/document.getElementById "modeswitch") "textContent" (str "Current Mode: " next-mode))
+    (test-word!)))
+
 ;;; init
 
 (js/console.log "hello from JS!")
@@ -102,11 +110,13 @@
     #(let []
       (swap! app-state assoc :cnn %)
       (js/console.log "loaded tf cnn model!")
-      (swap! app-state assoc :mode "cnn"))
+      (swap! app-state assoc :mode "CNN")
+      (aset (js/document.getElementById "modeswitch") "textContent" (str "Current Mode: " "CNN")))
     #(let []
       (js/console.log "failed to load tf cnn model!")
       (swap! app-state assoc :cnn nil)
-      (swap! app-state assoc :mode nil))))
+      (swap! app-state assoc :mode "Markov"))
+      (aset (js/document.getElementById "modeswitch") "textContent" (str "Current Mode: " "Markov"))))
 
 (.addEventListener (js/document.getElementById "wordtester") "input" test-word!)
 
@@ -114,5 +124,7 @@
   #(when (= (.-key %) "Enter") (try-submit-word!)))
 
 (.addEventListener (js/document.getElementById "playit") "click" try-submit-word!)
+
+(.addEventListener (js/document.getElementById "modeswitch") "click" switch-mode!)
 
 (test-word!)
