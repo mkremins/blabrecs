@@ -1,5 +1,6 @@
 (ns blabrecs.app
   (:require [blabrecs.main :as blabrecs]
+            [blabrecs.neural :as neural]
             [clojure.edn :as edn]
             [clojure.string :as str]))
 
@@ -17,8 +18,13 @@
   (atom {}))
 
 (defn sufficiently-probable? [word]
-  (let [{:keys [model baselines]} @app-state]
-    (> (blabrecs/probability model word) (get baselines (count word)))))
+  (let [{:keys [model baselines cnn mode]} @app-state]
+      (cond
+        (= mode "cnn")
+          (> (neural/probability cnn word) 0.82)
+        :else
+          (> (blabrecs/probability model word)
+             (get baselines (count word))))))
 
 (defn test-word [word]
   (let [word (str/trim (str/lower-case word))
@@ -90,6 +96,17 @@
   (fn [res]
     (js/console.log "loaded badwords!")
     (swap! app-state assoc :badwords (js->clj (js/JSON.parse (.-responseText res))))))
+
+(let [model (js/tf.loadLayersModel "model.json")]
+  (.then model
+    #(let []
+      (swap! app-state assoc :cnn %)
+      (js/console.log "loaded tf cnn model!")
+      (swap! app-state assoc :mode "cnn"))
+    #(let []
+      (js/console.log "failed to load tf cnn model!")
+      (swap! app-state assoc :cnn nil)
+      (swap! app-state assoc :mode nil))))
 
 (.addEventListener (js/document.getElementById "wordtester") "input" test-word!)
 
