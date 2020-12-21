@@ -63,17 +63,36 @@
 
 ;;; probability calculation via trained Markov model
 
+(defn neural-vectorize-word [word]
+  """Convert a string into the tokenized vector that the tensorflow
+  model can understand."""
+  (let [tokenizer
+        {"@" 1,"e" 2,"i" 3,"s" 4,"a" 5,"n" 6,"o" 7,"r" 8,"t" 9,
+        "l" 10, "c" 11,"u" 12,"p" 13,"d" 14,"m" 15,"h" 16,"g" 17,
+        "y" 18,"b" 19, "f" 20,"v" 21,"k" 22,"w" 23,"z" 24,"x" 25,
+        "q" 26,"j" 27, "'" 28, "/" 29, "\"" 30, "1" 31,"0" 32,
+        "8" 33,"5" 34,"7" 35,"6" 36,"9" 37,"2" 38,"3" 39,"4" 40}]
+          (apply array
+            (first
+              (partition 24 24 (repeat 0) (map #(get tokenizer % 0) word))
+              ))))
+
 (defn probability*
   "Given a Markov `model` and a `word`, return a vector whose first item is
   the model's total probability for this word and whose second item is
   a seq of the model's individual subprobabilities for this word."
   [model word]
-  (let [word-tensor (js/tf.tensor (neural/vectorize-word word)
-                                  (apply array [1 24]))
-        model (js/tf.loadLayersModel "model.json")]
-    (.then model
-      #(js/console.log (first (. (. % (predict word-tensor {:verbose true})) dataSync)))
-      #(js/console.log %)))
+   (let [v1 (js/console.log word)
+   v2 (js/console.log "test")
+     word-tensor (js/tf.tensor (neural-vectorize-word word)
+                               (apply array [1 24]))
+     ;word-tensor (js/tf.tensor word-vector (apply array [1 24]))
+     v3 (js/console.log word-tensor)
+         model (js/tf.loadLayersModel "model.json")]
+     (.then model
+       #(js/console.log (first (. (. % (predict word-tensor {:verbose true})) dataSync)))
+       #(js/console.log %)))
+  (js/console.log (neural/probability nil word))
   (let [subprobs (->> (word->ngrams ngram-size word)
                       (map #(get-in model (ngram->path %))))
         prob (apply * subprobs)]
