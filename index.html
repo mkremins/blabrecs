@@ -59,7 +59,7 @@
     font-size: 1.25rem;
     padding: 0.25rem 0.5rem;
   }
-  #playit:not(:enabled) {
+  button:not(:enabled) {
     cursor: not-allowed;
     opacity: 50%;
   }
@@ -115,12 +115,17 @@
     <div class="buttons">
       <button id="playit">Play It</button>
     </div>
+    <div class="buttons">
+      <button id="usemarkov" disabled>Use Markov Classifier</button>
+      <button id="useneural">Use Neural Classifier</button>
+    </div>
     <table id="lexicon" class="disabled">
       <tr>
         <th>Word</th>
         <th>Meaning</th>
       </tr>
     </table>
+
     <div class="longdesc">
       <h2>What's all this, then?</h2>
       <p><strong>BLABRECS</strong> is a rules modification for the wordgame SCRABBLE that swaps out the dictionary of real-if-obscure English words for a capricious artificial intelligence. In BLABRECS, real English words aren't allowed! Instead, you have to play nonsense words that <em>sound</em> like English to the AI. These nonsense words are called – you guessed it – BLABRECS.</p>
@@ -130,7 +135,9 @@
       <h2>I found a real word that the AI thinks is playable! What should I do?</h2>
       <p>This happens often with proper nouns (which SCRABBLE generally disallows) and with inflected forms of base words that are disallowed. I think you should play by the spirit of BLABRECS and not the letter, but what this means is ultimately up to you. Is the game primarily about exploring the vast "shadow English" implied by the statistical distribution of letter sequences, or is it about the inherent absurdity of an external authority presuming to dictate your language to you? Either interpretation seems valid to me.</p>
       <h2>How does the AI work?</h2>
-      <p>Right now it uses a Markov model trained on the <a href="https://www.wordgamedictionary.com/enable/">ENABLE word list</a> used in a number of wordgames. It looks at the statistical patterns of letter sequences in English words and uses this information to determine how likely a sequence of letters is to be a real English word. Then it rejects both real dictionary words and fake words that it deems insufficiently plausible. Check out the <a href="https://github.com/mkremins/blabrecs">source code</a> if you want to learn more.</p>
+      <p>The current version of BLABRECS has two AI judges that you can switch between. <a href="https://github.com/mkremins/blabrecs">Source code</a> for both is available if you want to learn more.</p>
+      <p>The original judge uses a Markov chain trained on the <a href="https://www.wordgamedictionary.com/enable/">ENABLE word list</a> used in a number of wordgames. It looks at the statistical patterns of letter sequences in English words and uses this information to determine how likely a sequence of letters is to be a real English word. Then it rejects both real dictionary words and fake words that it deems insufficiently plausible.</p>
+      <p>The second judge, contributed by <a href="https://isaackarth.com">Isaac Karth</a>, uses a convolutional neural network trained on a substantially larger word list. The features that this judge uses to evaluate words are a bit more opaque, but still ultimately statistical in nature.</p>
       <p>I might update BLABRECS to provide a wider range of AI "opponents" using a variety of different technologies in the future. Stay tuned!</p>
       <h2>Why is it called BLABRECS?</h2>
       <p>I generated every possible permutation of the word SCRABBLE and asked an early version of the AI to sort them from least to most statistically likely. BRABLECS won out by a significant margin, beating not only the real word SCRABBLE but also my hand-designed previous title BESCRALB. Then I switched the L and the R because BLABRECS sounds better and I'm not about to let a computer tell me what to do.</p>
@@ -139,5 +146,6 @@
     </div>
   </main>
 </body>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.8.0/dist/tf.min.js"></script>
 <script src="out/main.js"></script>
 </html>

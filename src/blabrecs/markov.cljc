@@ -1,4 +1,4 @@
-(ns blabrecs.main
+(ns blabrecs.markov
   (:require [clojure.string :as str]))
 
 ;;; common utility functions

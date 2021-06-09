@@ -1,5 +1,5 @@
-(ns blabrecs.train
-  (:require [blabrecs.main :as blabrecs]
+(ns blabrecs.markov-train
+  (:require [blabrecs.markov :as markov]
             [clojure.string :as str]))
 
 (-> (slurp "enable.txt")

@@ -1,5 +1,6 @@
 (ns blabrecs.app
-  (:require [blabrecs.main :as blabrecs]
+  (:require [blabrecs.markov :as markov]
+            [blabrecs.neural :as neural]
             [clojure.edn :as edn]
             [clojure.string :as str]))
 
@@ -14,17 +15,26 @@
 ;;; app-specific
 
 (def app-state
-  (atom {}))
+  (atom {:mode :markov}))
 
 (defn sufficiently-probable? [word]
-  (let [{:keys [model baselines]} @app-state]
-    (> (blabrecs/probability model word) (get baselines (count word)))))
+  (let [state @app-state]
+    (cond
+      (= (:mode state) :markov)
+        (> (markov/probability (:model state) word)
+           (get (:baselines state) (count word)))
+      (= (:mode state) :neural)
+        (> (neural/probability (:cnn state) word) 0.82)
+      :else
+        false)))
 
 (defn test-word [word]
   (let [word (str/trim (str/lower-case word))
         state @app-state]
     (cond
-      (or (not (:model state)) (not (:baselines state)) (not (:words state)))
+      (or (and (= (:mode state) :markov) (not (:model state)))
+          (and (= (:mode state) :neural) (not (:cnn state)))
+          (not (:words state)))
         {:status :empty :msg "hang on a sec, still loading…"}
       (= word "")
         {:status :empty :msg "type in a word!"}
@@ -34,7 +44,7 @@
         {:status :err :msg "that's too short to be a word!"}
       (> (count word) 15)
         {:status :err :msg "that's too long, it won't fit on the board!"}
-      (contains? (:words @app-state) word)
+      (contains? (:words state) word)
         {:status :err :msg "can't play that, it's in the dictionary!"}
       (not (sufficiently-probable? word))
         {:status :err :msg "no way that's a word!"}
@@ -70,13 +80,11 @@
 
 ;;; init
 
-(js/console.log "hello from JS!")
-
 (load-file! "model.edn"
   (fn [res]
-    (js/console.log "loaded model!")
+    (js/console.log "loaded markov model!")
     (let [model (edn/read-string (.-responseText res))
-          baselines (blabrecs/gen-baseline-probs model)]
+          baselines (markov/gen-baseline-probs model)]
       (swap! app-state assoc :model model :baselines baselines)
       (test-word!))))
 
@@ -91,11 +99,32 @@
     (js/console.log "loaded badwords!")
     (swap! app-state assoc :badwords (js->clj (js/JSON.parse (.-responseText res))))))
 
+(let [cnn-promise (js/tf.loadLayersModel "model.json")]
+  (.then cnn-promise
+    #(do (js/console.log "loaded tf cnn model!")
+         (swap! app-state assoc :cnn %))
+    #(js/console.log "failed to load tf cnn model!")))
+
 (.addEventListener (js/document.getElementById "wordtester") "input" test-word!)
 
 (.addEventListener (js/document.getElementById "wordtester") "keypress"
   #(when (= (.-key %) "Enter") (try-submit-word!)))
 
 (.addEventListener (js/document.getElementById "playit") "click" try-submit-word!)
+
+(let [usemarkov (js/document.getElementById "usemarkov")
+      useneural (js/document.getElementById "useneural")]
+  (.addEventListener usemarkov "click"
+    #(do (js/console.log "using markov classifier!")
+         (set! (.-disabled usemarkov) true)
+         (set! (.-disabled useneural) false)
+         (swap! app-state assoc :mode :markov)
+         (test-word!)))
+  (.addEventListener useneural "click"
+    #(do (js/console.log "using neural classifier!")
+         (set! (.-disabled usemarkov) false)
+         (set! (.-disabled useneural) true)
+         (swap! app-state assoc :mode :neural)
+         (test-word!))))
 
 (test-word!)
